@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prices } from '~/prices/schemas/price.schemas';
+import { Users } from '~/users/schemas/users.schema';
 import { HydratedDocument } from 'mongoose';
-import * as mongoose from 'mongoose';
-
+import mongoose from 'mongoose';
 export type PowersDocument = HydratedDocument<Powers>;
 
 @Schema({
@@ -9,6 +10,7 @@ export type PowersDocument = HydratedDocument<Powers>;
   toObject: {
     virtuals: true,
     transform: function (doc, ret) {
+      delete ret.id;
       delete ret.customerId;
       delete ret.priceId;
       return ret;
@@ -17,6 +19,7 @@ export type PowersDocument = HydratedDocument<Powers>;
   toJSON: {
     virtuals: true,
     transform: function (doc, ret) {
+      delete ret.id;
       delete ret.customerId;
       delete ret.priceId;
       return ret;
@@ -25,16 +28,28 @@ export type PowersDocument = HydratedDocument<Powers>;
 })
 export class Powers {
   @Prop()
-  index: number;
-  @Prop()
   indexOfMonth: Date;
+  @Prop()
+  index: number;
   @Prop({
-    type: [mongoose.Schema.Types.ObjectId],
+    type: mongoose.Types.ObjectId,
   })
-  priceId: mongoose.Schema.Types.ObjectId[];
+  priceId: mongoose.Types.ObjectId;
   @Prop({
-    type: [mongoose.Schema.Types.ObjectId],
+    type: mongoose.Types.ObjectId,
   })
-  customerId: mongoose.Schema.Types.ObjectId[];
+  customerId: mongoose.Types.ObjectId;
 }
-export const PricesSchema = SchemaFactory.createForClass(Powers);
+const PowersSchema = SchemaFactory.createForClass(Powers);
+PowersSchema.virtual('rangePrice', {
+  ref: Prices.name,
+  localField: 'priceId',
+  foreignField: '_id',
+  justOne: true,
+});
+PowersSchema.virtual('customer', {
+  ref: Users.name,
+  localField: 'customerId',
+  foreignField: '_id',
+});
+export { PowersSchema };

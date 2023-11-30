@@ -26,9 +26,10 @@ export class PricesService {
       throw new NotFoundException('Price get failed !');
     }
     return {
-      data: price,
+      data: price[0],
       statusCode: 200,
       message: 'Price get successfully !',
     };
   }
+
 }

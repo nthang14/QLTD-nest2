@@ -73,4 +73,12 @@ export class UsersService {
       return null;
     }
   }
+  async findUserByQuery(query: any) {
+    const user = await this.model.findOne(query).exec();
+    if (!!user) {
+      return user;
+    } else {
+      return null;
+    }
+  }
 }

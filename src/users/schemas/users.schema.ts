@@ -14,5 +14,7 @@ export class Users {
   passport: string;
   @Prop()
   password: string;
+  @Prop({ type: Number, default: 1 })
+  level?: number;
 }
 export const UsersSchema = SchemaFactory.createForClass(Users);
