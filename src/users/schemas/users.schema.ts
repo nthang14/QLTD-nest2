@@ -11,7 +11,7 @@ export class Users {
   @Prop()
   username: string;
   @Prop()
-  avatar: string;
+  passport: string;
   @Prop()
   password: string;
 }

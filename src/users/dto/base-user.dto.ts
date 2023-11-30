@@ -9,7 +9,7 @@ export class BaseUserDTO {
   username: string;
 
   @IsNotEmpty()
-  avatar: string;
+  passport: string;
 
   @IsNotEmpty()
   password: string;

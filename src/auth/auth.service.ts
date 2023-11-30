@@ -27,6 +27,7 @@ export class AuthService {
     const payload = {
       username: user.username,
       _id: user._id,
+      level: profile.level,
     };
     return {
       data: {
