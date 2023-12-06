@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Prices, PricesDocument } from '~/prices/schemas/price.schemas';
 import { Model } from 'mongoose';
+
 @Injectable()
 export class PricesService {
   constructor(
@@ -31,5 +32,4 @@ export class PricesService {
       message: 'Price get successfully !',
     };
   }
-
 }

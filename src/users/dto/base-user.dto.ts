@@ -3,14 +3,12 @@ export class BaseUserDTO {
   @IsNotEmpty()
   @MaxLength(128)
   fullName: string;
-
-  @IsNotEmpty()
-  @MaxLength(50)
-  username: string;
-
+  username?: string;
   @IsNotEmpty()
   passport: string;
-
+  password?: string;
   @IsNotEmpty()
-  password: string;
+  phoneNumber: string;
+  @IsNotEmpty()
+  address: string;
 }
