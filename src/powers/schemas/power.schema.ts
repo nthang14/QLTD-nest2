@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Prices } from '~/prices/schemas/price.schemas';
 import { Users } from '~/users/schemas/users.schema';
 import { HydratedDocument } from 'mongoose';
 import mongoose from 'mongoose';
+import { RangeType } from '~/prices/schemas/price.schemas';
+
 export type PowersDocument = HydratedDocument<Powers>;
 
 @Schema({
@@ -31,22 +32,15 @@ export class Powers {
   indexOfMonth: Date;
   @Prop()
   index: number;
+  @Prop()
+  rangePrice: RangeType[];
   @Prop({
     type: mongoose.Types.ObjectId,
-  })
-  priceId: mongoose.Types.ObjectId;
-  @Prop({
-    type: mongoose.Types.ObjectId,
+    ref: Users.name,
   })
   customerId: mongoose.Types.ObjectId;
 }
 const PowersSchema = SchemaFactory.createForClass(Powers);
-PowersSchema.virtual('rangePrice', {
-  ref: Prices.name,
-  localField: 'priceId',
-  foreignField: '_id',
-  justOne: true,
-});
 PowersSchema.virtual('customer', {
   ref: Users.name,
   localField: 'customerId',

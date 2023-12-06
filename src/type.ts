@@ -2,4 +2,10 @@ type RangeType = {
   unitPrice: number;
   range: number;
 };
-export { RangeType };
+type Search = {
+  limit?: number;
+  page?: number;
+  search?: string;
+};
+
+export { RangeType, Search };

@@ -14,5 +14,6 @@ import { UserModule } from '~/users/users.module';
   ],
   controllers: [PowersController],
   providers: [PowersService],
+  exports: [PowersService],
 })
 export class PowersModule {}

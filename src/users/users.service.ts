@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Users, UsersDocument } from '~/users/schemas/users.schema';
 import { Model } from 'mongoose';
+import { Search } from '~/type';
+import { PAGE_DEFAULT, LIMIT_DEFAULT } from '~/utils/constants';
 
 @Injectable()
 export class UsersService {
@@ -21,9 +23,23 @@ export class UsersService {
       message: 'User create successfully !',
     };
   }
-  async getListUser() {
-    const users = await this.model.find().exec();
-    return users;
+  async getListUser(query?: any, searchQuery?: Search) {
+    const limit = searchQuery?.limit || LIMIT_DEFAULT;
+    const skip = ((searchQuery?.page || PAGE_DEFAULT) - 1) * limit;
+    const users = await this.model.find(query).skip(skip).limit(limit).exec();
+    const total = await this.model.find(query).count();
+    const totalPage = Math.ceil(total / limit);
+    if (!users) {
+      throw new NotFoundException('Get user failed !');
+    }
+    return {
+      data: users,
+      total: total,
+      totalPage: totalPage,
+      currentPage: parseInt(skip.toString()),
+      statusCode: 200,
+      message: 'Get user successfully !',
+    };
   }
   async getUserById(id: string) {
     const user = await this.model.findById(id).exec();
@@ -49,8 +65,23 @@ export class UsersService {
       message: 'User updated successfully !',
     };
   }
+  async updateUserStatusById(id: string, isActive: boolean) {
+    const user = await this.model
+      .findByIdAndUpdate(id, { isActive: isActive }, { new: true })
+      .exec();
+    if (!user) {
+      throw new NotFoundException('User update failed !');
+    }
+    return {
+      statusCode: 200,
+      data: user,
+      message: 'User updated successfully !',
+    };
+  }
   async deleteUser(id: string) {
-    const result = await this.model.findByIdAndDelete(id).exec();
+    const result = await this.model
+      .findByIdAndUpdate(id, { isActive: false })
+      .exec();
     const users = await this.model.find().exec();
     if (!!result) {
       return {
@@ -73,7 +104,7 @@ export class UsersService {
       return null;
     }
   }
-  async findUserByQuery(query: any) {
+  async findUserByPassport(query: any) {
     const user = await this.model.findOne(query).exec();
     if (!!user) {
       return user;
