@@ -14,12 +14,10 @@ export class PowersService {
 
   async createPower(powerPayload: Partial<Powers>) {
     const power = await this.model.create(powerPayload).then((f) =>
-      f.populate([
-        {
-          path: 'customer',
-          select: '_id passport fullName',
-        },
-      ]),
+      f.populate({
+        path: 'customer',
+        select: '_id passport fullName',
+      }),
     );
     if (!power) {
       throw new NotFoundException('Power create failed !');
@@ -50,7 +48,17 @@ export class PowersService {
   async getPowers(query?: any, searchQuery?: Search) {
     const limit = searchQuery?.limit || LIMIT_DEFAULT;
     const skip = ((searchQuery?.page || PAGE_DEFAULT) - 1) * limit;
-    const powers = await this.model.find(query).skip(skip).limit(limit).exec();
+    const powers = await this.model
+      .find(query)
+      .skip(skip)
+      .limit(limit)
+      .populate([
+        {
+          path: 'customer',
+          select: '_id passport fullName',
+        },
+      ])
+      .exec();
     const total = await this.model.find(query).count();
     const totalPage = Math.ceil(total / limit);
     if (!powers) {

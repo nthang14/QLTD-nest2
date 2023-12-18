@@ -33,6 +33,10 @@ export class Powers {
   @Prop()
   index: number;
   @Prop()
+  lastIndex: number;
+  @Prop({ type: String, default: '' })
+  note?: string;
+  @Prop()
   rangePrice: RangeType[];
   @Prop({
     type: mongoose.Types.ObjectId,
@@ -45,5 +49,6 @@ PowersSchema.virtual('customer', {
   ref: Users.name,
   localField: 'customerId',
   foreignField: '_id',
+  justOne: true,
 });
 export { PowersSchema };

@@ -34,11 +34,8 @@ export class PowersController {
   @Post()
   async createPower(@Body() power: CreatePowerDto) {
     const indexOfMonth = new Date(power.indexOfMonth);
-    const customer = await this.userService.findUserByPassport({
-      passport: power.passport,
-    });
     const isPower = await this.service.getPowerByQuery({
-      customerId: customer._id,
+      customerId: new mongoose.Types.ObjectId(power.customerId),
       indexOfMonth: indexOfMonth,
     });
     if (!isPower) {
@@ -47,7 +44,8 @@ export class PowersController {
         index: power.index,
         indexOfMonth: indexOfMonth,
         rangePrice: rangePrice.data.range,
-        customerId: customer._id,
+        customerId: new mongoose.Types.ObjectId(power.customerId),
+        lastIndex: power.lastIndex,
       };
       return await this.service.createPower(powerPayload);
     } else {
@@ -63,12 +61,11 @@ export class PowersController {
   async getPreviousPower(@Body() query: any) {
     if (query && query.customerId && query.indexOfMonth) {
       const indexOfMonth = new Date(query.indexOfMonth);
-      console.log('indexOfMonth', indexOfMonth);
       const isPower = await this.service.getPowerByQuery({
-        customerId: query.customerId,
+        customerId: new mongoose.Types.ObjectId(query.customerId),
         indexOfMonth: indexOfMonth,
       });
-      if (!isPower) {
+      if (isPower) {
         return isPower;
       }
     }
@@ -80,15 +77,13 @@ export class PowersController {
   @Put()
   async updatePower(@Param('id') id: string, @Body() power: UpdatePowerDto) {
     const indexOfMonth = new Date(power.indexOfMonth);
-    const customer = await this.userService.findUserByPassport({
-      passport: power.passport,
-    });
     const rangePrice = await this.priceService.getRangePriceCurrent();
     const powerPayload: Powers = {
       index: power.index,
       indexOfMonth: indexOfMonth,
       rangePrice: rangePrice.data.range,
-      customerId: customer._id,
+      customerId: new mongoose.Types.ObjectId(power.customerId),
+      lastIndex: power.lastIndex,
     };
     return await this.service.updatePower(id, powerPayload);
   }
@@ -111,5 +106,11 @@ export class PowersController {
       }
     }
     return await this.service.getPowers(queryFilter, paging);
+  }
+  @UseGuards(RoleGuard(Role.Admin))
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getPowerById(@Param('id') id: string) {
+    return await this.service.getPowerById(id);
   }
 }
