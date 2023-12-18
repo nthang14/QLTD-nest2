@@ -21,6 +21,8 @@ import { PAGE_DEFAULT, LIMIT_DEFAULT } from '~/utils/constants';
 class PReceipt {
   powerId: string;
   customerId: string;
+  energy: number;
+  rangePrice: any[];
 }
 @Controller('receipts')
 export class ReceiptsController {
@@ -33,26 +35,47 @@ export class ReceiptsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createReceipt(@Body() paramsPower: PReceipt) {
-    const customerId = new mongoose.Types.ObjectId(paramsPower.customerId);
-    const powerPrevious = await this.powerService.getPowersByQuery(customerId);
-    const powerCurrent = await this.powerService.getPowerById(
-      paramsPower.powerId,
-    );
-    const energy = (powerCurrent?.index || 0) - (powerPrevious.index || 0);
-    const totalBill = calBill(energy, powerCurrent.rangePrice);
+    const totalBill = calBill(paramsPower.energy, paramsPower.rangePrice);
     const payloadReceipt = {
-      energy,
+      energy: paramsPower.energy,
       totalBill,
-      customerId: customerId,
+      customerId: new mongoose.Types.ObjectId(paramsPower.customerId),
       powerId: new mongoose.Types.ObjectId(paramsPower.powerId),
     };
-    return await this.service.createReceipt(payloadReceipt);
+    const result = await this.service.createReceipt(payloadReceipt);
+    return result;
   }
   @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Put('/:id')
   async paidReceipt(@Param('id') id: string) {
     return await this.service.updateReceipt(id);
+  }
+
+  @UseGuards(RoleGuard(Role.Admin))
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id')
+  async getReceiptById(@Param('id') id: string) {
+    const receipt: any = await this.service.getReceiptById(id);
+    if (receipt) {
+      const power: any = await this.powerService.getPowerById(
+        receipt?.powerId.toString(),
+      );
+      const data = {
+        ...receipt._doc,
+        rangePrice: power?.rangePrice,
+        customer: power?.customer || {},
+        index: power?.index || 0,
+        lastIndex: power?.lastIndex || 0,
+        indexOfMonth: power?.indexOfMonth || '',
+      };
+      return {
+        data: data,
+        statusCode: 200,
+        message: 'Get receipt successfully !',
+      };
+    }
+    return null;
   }
 
   @UseGuards(RoleGuard(Role.Admin))

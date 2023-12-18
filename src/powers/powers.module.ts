@@ -5,7 +5,6 @@ import { PowersService } from '~/powers/powers.service';
 import { Powers, PowersSchema } from '~/powers/schemas/power.schema';
 import { PricesModule } from '~/prices/prices.module';
 import { UserModule } from '~/users/users.module';
-
 @Module({
   imports: [
     PricesModule,

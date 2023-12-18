@@ -12,12 +12,12 @@ import { ReceiptsModule } from '~/receipts/receipts.module';
   imports: [
     UserModule,
     AuthModule,
+    ReceiptsModule,
     MongooseModule.forRoot(
       'mongodb+srv://nguyenhang04141997:Hang1441997@cluster0.hqeq7yk.mongodb.net/QLTD',
     ),
     PricesModule,
     PowersModule,
-    ReceiptsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

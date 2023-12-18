@@ -51,6 +51,7 @@ export class PowersService {
     const powers = await this.model
       .find(query)
       .skip(skip)
+      .sort({ indexOfMonth: -1 })
       .limit(limit)
       .populate([
         {
@@ -93,7 +94,7 @@ export class PowersService {
       .populate([
         {
           path: 'customer',
-          select: '_id passport fullName',
+          select: '_id passport phoneNumber fullName address',
         },
       ])
       .exec();

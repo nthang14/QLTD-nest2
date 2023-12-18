@@ -32,6 +32,8 @@ export class Powers {
   indexOfMonth: Date;
   @Prop()
   index: number;
+  @Prop({ type: Boolean, default: false })
+  isReceipt?: boolean;
   @Prop()
   lastIndex: number;
   @Prop({ type: String, default: '' })

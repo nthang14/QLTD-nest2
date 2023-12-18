@@ -61,4 +61,12 @@ export class ReceiptsService {
       message: 'Get receipt successfully !',
     };
   }
+
+  async getReceiptById(id: any) {
+    const receipt = await this.model.findById(id).exec();
+    if (!receipt) {
+      return null;
+    }
+    return receipt;
+  }
 }

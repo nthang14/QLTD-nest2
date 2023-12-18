@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ReceiptsService } from './receipts.service';
+import { ReceiptsService } from '~/receipts/receipts.service';
 import { Receipts, ReceiptsSchema } from '~/receipts/schemas/receipt.schema';
 import { PowersModule } from '~/powers/powers.module';
 import { ReceiptsController } from '~/receipts/receipts.controller';
 import { UserModule } from '~/users/users.module';
-
 @Module({
   imports: [
     PowersModule,
@@ -16,5 +15,6 @@ import { UserModule } from '~/users/users.module';
   ],
   controllers: [ReceiptsController],
   providers: [ReceiptsService],
+  exports: [ReceiptsService],
 })
 export class ReceiptsModule {}

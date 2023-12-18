@@ -21,7 +21,6 @@ export class PricesController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createRangePrice(@Body() price: CreatePriceDto) {
-    console.log('price', price);
     return await this.service.createPrice(price);
   }
 

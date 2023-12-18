@@ -10,5 +10,6 @@ export class BasePowerDTO {
   passport: string;
   @IsOptional()
   note?: string;
+  @IsNotEmpty()
   customerId: string;
 }

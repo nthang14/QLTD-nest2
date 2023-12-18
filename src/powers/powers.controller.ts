@@ -15,7 +15,6 @@ import RoleGuard from '~/auth/guards/role-auth';
 import { Role } from '~/enum';
 import { CreatePowerDto } from '~/powers/dto/create-power.dto';
 import { UpdatePowerDto } from '~/powers/dto/update-power.dto';
-
 import { PricesService } from '~/prices/prices.service';
 import { UsersService } from '~/users/users.service';
 import { Powers } from './schemas/power.schema';
@@ -46,6 +45,7 @@ export class PowersController {
         rangePrice: rangePrice.data.range,
         customerId: new mongoose.Types.ObjectId(power.customerId),
         lastIndex: power.lastIndex,
+        note: power.note,
       };
       return await this.service.createPower(powerPayload);
     } else {
@@ -74,7 +74,7 @@ export class PowersController {
 
   @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
-  @Put()
+  @Put(':id')
   async updatePower(@Param('id') id: string, @Body() power: UpdatePowerDto) {
     const indexOfMonth = new Date(power.indexOfMonth);
     const rangePrice = await this.priceService.getRangePriceCurrent();
@@ -84,6 +84,7 @@ export class PowersController {
       rangePrice: rangePrice.data.range,
       customerId: new mongoose.Types.ObjectId(power.customerId),
       lastIndex: power.lastIndex,
+      note: power.note,
     };
     return await this.service.updatePower(id, powerPayload);
   }
