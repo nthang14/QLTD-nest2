@@ -43,9 +43,50 @@ export class ReceiptsService {
     const limit = searchQuery?.limit || LIMIT_DEFAULT;
     const skip = ((searchQuery?.page || PAGE_DEFAULT) - 1) * limit;
     const receipts = await this.model
-      .find(query)
-      .skip(skip)
-      .limit(limit)
+      .aggregate([
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'customerId',
+            foreignField: '_id',
+            as: 'customer',
+          },
+        },
+        {
+          $unwind: '$customer',
+        },
+        {
+          $match: query?.passport
+            ? {
+                'customer.passport': query?.passport,
+              }
+            : {},
+        },
+        {
+          $lookup: {
+            from: 'powers',
+            localField: 'powerId',
+            foreignField: '_id',
+            as: 'power',
+          },
+        },
+        {
+          $unwind: '$power',
+        },
+        {
+          $match: query?.indexOfMonth
+            ? {
+                'power.indexOfMonth': new Date(query?.indexOfMonth),
+              }
+            : {},
+        },
+        {
+          $limit: typeof limit === 'number' ? limit : parseInt(limit),
+        },
+        {
+          $skip: typeof skip === 'number' ? skip : parseInt(skip),
+        },
+      ])
       .exec();
     const total = await this.model.find(query).count();
     const totalPage = Math.ceil(total / limit);
@@ -68,5 +109,43 @@ export class ReceiptsService {
       return null;
     }
     return receipt;
+  }
+  async reportReceipt(query: any) {
+    return await this.model.aggregate([
+      {
+        $lookup: {
+          from: 'powers',
+          localField: 'powerId',
+          foreignField: '_id',
+          as: 'power',
+        },
+      },
+      {
+        $unwind: '$power',
+      },
+      {
+        $match: {
+          'power.indexOfMonth': { $gte: query.to, $lte: query.from },
+        },
+      },
+      {
+        $group: {
+          _id: '$power.indexOfMonth',
+          totalEnergy: { $sum: '$energy' },
+          totalPricePaid: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [{ $gte: ['$paid', true] }, '$totalBill'],
+                },
+                '$totalBill',
+                0,
+              ],
+            },
+          },
+          totalPrice: { $sum: '$totalBill' },
+        },
+      },
+    ]);
   }
 }

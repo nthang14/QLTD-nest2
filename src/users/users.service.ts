@@ -65,6 +65,19 @@ export class UsersService {
       message: 'User updated successfully !',
     };
   }
+  async changePassword(id: string, userPayload: any) {
+    const user = await this.model
+      .findByIdAndUpdate(id, {password: userPayload.password, first: false}, { new: true })
+      .exec();
+    if (!user) {
+      throw new NotFoundException('Change password failed !');
+    }
+    return {
+      statusCode: 200,
+      data: user,
+      message: 'Change password successfully !',
+    };
+  }
   async updateUserStatusById(id: string, isActive: boolean) {
     const user = await this.model
       .findByIdAndUpdate(id, { isActive: isActive }, { new: true })
@@ -111,5 +124,13 @@ export class UsersService {
     } else {
       return null;
     }
+  }
+
+  async countTotalUsers() {
+    const total = await this.model.count({ level: 1, isActive: true });
+    return {
+      total: total,
+      statusCode: 200,
+    };
   }
 }

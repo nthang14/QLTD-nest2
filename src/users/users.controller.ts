@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Post,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from '~/users/users.service';
 import { CreateUserDto } from '~/users/dto/create-user.dto';
@@ -16,6 +17,8 @@ import { JwtAuthGuard } from '~/auth/guards/jwt-auth.guard';
 import RoleGuard from '~/auth/guards/role-auth';
 import { Role } from '~/enum';
 import { PAGE_DEFAULT, LIMIT_DEFAULT } from '~/utils/constants';
+import { Request } from 'express';
+
 @Controller()
 export class UsersController {
   // eslint-disable-next-line prettier/prettier
@@ -56,7 +59,12 @@ export class UsersController {
   async getUserById(@Param('id') id: string) {
     return await this.service.getUserById(id);
   }
-
+  @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  async changePassword(@Req() request: Request, @Body() user: any) {
+    const { _id: userId }: any = request.user;
+    return await this.service.changePassword(userId, user);
+  }
   @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Put('users/:id')

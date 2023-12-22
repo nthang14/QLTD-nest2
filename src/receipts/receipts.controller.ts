@@ -49,10 +49,11 @@ export class ReceiptsController {
   @UseGuards(JwtAuthGuard)
   @Put('/:id')
   async paidReceipt(@Param('id') id: string) {
-    return await this.service.updateReceipt(id);
+    const result: any = await this.service.updateReceipt(id);
+    await this.powerService.updateReceiptStatus(result.data.powerId);
+    return result;
   }
 
-  @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Get('/:id')
   async getReceiptById(@Param('id') id: string) {
@@ -78,7 +79,6 @@ export class ReceiptsController {
     return null;
   }
 
-  @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Get()
   async getReceipts(@Query() query: any) {
@@ -87,14 +87,14 @@ export class ReceiptsController {
       limit: query.limit || LIMIT_DEFAULT,
     };
     const queryFilter: any = {};
+
     if (query?.passport) {
-      const customer = await this.userService.findUserByPassport({
-        passport: query.passport,
-      });
-      if (!!customer) {
-        queryFilter.customerId = customer._id;
-      }
+      queryFilter.passport = query.passport;
+    }
+    if (query?.indexOfMonth) {
+      queryFilter.indexOfMonth = query.indexOfMonth;
     }
     return await this.service.getReceipts(queryFilter, paging);
   }
+  
 }

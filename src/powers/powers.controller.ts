@@ -89,7 +89,6 @@ export class PowersController {
     return await this.service.updatePower(id, powerPayload);
   }
 
-  @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Get()
   async getPowers(@Query() query: any) {
@@ -108,7 +107,6 @@ export class PowersController {
     }
     return await this.service.getPowers(queryFilter, paging);
   }
-  @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getPowerById(@Param('id') id: string) {

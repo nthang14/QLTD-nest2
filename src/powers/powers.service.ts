@@ -131,4 +131,23 @@ export class PowersService {
       return null;
     }
   }
+  async updateReceiptStatus(id: string) {
+    const power = await this.model
+      .findByIdAndUpdate(
+        id,
+        { isReceipt: true },
+        {
+          new: true,
+        },
+      )
+      .exec();
+    if (!power) {
+      throw new NotFoundException('Power create failed !');
+    }
+    return {
+      data: power,
+      statusCode: 201,
+      message: 'Power create successfully !',
+    };
+  }
 }

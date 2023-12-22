@@ -12,6 +12,8 @@ export class Users {
   username?: string;
   @Prop({ type: Boolean, default: true })
   isActive?: boolean;
+  @Prop({ type: Boolean, default: true })
+  first?: boolean;
   @Prop()
   passport: string;
   @Prop()

@@ -4,6 +4,7 @@ export class BaseUserDTO {
   @MaxLength(128)
   fullName: string;
   username?: string;
+  first?: boolean;
   @IsNotEmpty()
   passport: string;
   password?: string;
