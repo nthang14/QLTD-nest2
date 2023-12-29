@@ -49,7 +49,7 @@ export class UsersController {
   }
   @UseGuards(RoleGuard(Role.Admin))
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post('users')
   async createUser(@Body() user: CreateUserDto) {
     user.username = user.passport;
     return await this.service.createUser(user);
